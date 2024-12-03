@@ -359,6 +359,13 @@ void DataFrameMessage::deserialize(
 
     for (auto& rigidBody : dataFrame->rigidBodies) {
       rigidBody.rigidBodyMarker = rigidBodyToMarker[rigidBody.bodyId];
+       // Retrieve the vector of marker positions for this rigid body
+      const auto& markers = rigidBody.rigidBodyMarker;
+
+      // Iterate over each marker position in the vector
+      for (const auto& marker_pos : markers) {
+        ROS_WARN("  Marker Pos: [%3.2f, %3.2f, %3.2f]", marker_pos[0], marker_pos[1], marker_pos[2]);
+      }
     }
 
   }
