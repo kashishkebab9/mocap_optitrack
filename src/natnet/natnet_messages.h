@@ -31,6 +31,8 @@
 
 #include <vector>
 #include <mocap_optitrack/data_model.h>
+#include <geometry_msgs/PoseArray.h>
+#include <geometry_msgs/Pose.h>
 
 namespace natnet
 {
