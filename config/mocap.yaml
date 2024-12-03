@@ -7,6 +7,7 @@ rigid_bodies:
         pose: crazy00
         pose2d: crazy00/2d
         odom: crazy00/Odom
+        marker: crazy00/markers
         tf: tf
         child_frame_id: crazy00
         parent_frame_id: world

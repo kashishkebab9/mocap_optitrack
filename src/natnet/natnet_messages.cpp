@@ -298,6 +298,7 @@ void DataFrameMessage::deserialize(
     int numLabeledMarkers = 0;
     utilities::read_and_seek(msgBufferIter, numLabeledMarkers);
     ROS_DEBUG("Labeled marker count: %d", numLabeledMarkers);
+    std::map<int, std::vector<std::array<double, 3>>> rigidBodyToMarker;
 
     // Loop through labeled markers
     for (int j=0; j < numLabeledMarkers; j++)
@@ -338,8 +339,8 @@ void DataFrameMessage::deserialize(
       std::array<double, 3> marker_pos = {marker.x, marker.y, marker.z};
 
       // append marker pos to this modelIds vector
-      dataFrame->rigidBodyToMarker.clear();
-      dataFrame->rigidBodyToMarker[modelId].push_back(marker_pos); 
+      rigidBodyToMarker.clear();
+      rigidBodyToMarker[modelId].push_back(marker_pos); 
 
       ROS_DEBUG("  MarkerID: %d, ModelID: %d", markerId, modelId);
       ROS_DEBUG("    Pos: [%3.2f,%3.2f,%3.2f]", 
@@ -354,6 +355,10 @@ void DataFrameMessage::deserialize(
         utilities::read_and_seek(msgBufferIter, residual);
         ROS_DEBUG("    Residual:  %3.2f", residual);
       }
+    }
+
+    for (auto& rigidBody : dataFrame->rigidBodies) {
+      rigidBody.rigidBodyMarker = rigidBodyToMarker[rigidBody.bodyId];
     }
 
   }

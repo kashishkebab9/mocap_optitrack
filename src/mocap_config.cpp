@@ -82,6 +82,7 @@ const std::string RigidBodies = "rigid_bodies";
 const std::string PoseTopicName = "pose";
 const std::string Pose2dTopicName = "pose2d";
 const std::string OdomTopicName = "odom";
+const std::string MarkerTopicName = "marker";
 const std::string EnableTfPublisher = "tf";
 const std::string ChildFrameId = "child_frame_id";
 const std::string ParentFrameId = "parent_frame_id";
@@ -211,6 +212,20 @@ void NodeConfiguration::fromRosParam(
           else
           {
             publisherConfig.publishOdom = true;
+          }
+
+          bool readMarkerTopicName = impl::check_and_get_param(bodyParameters,
+                                   rosparam::keys::MarkerTopicName, publisherConfig.markerTopicName);
+
+          if (!readMarkerTopicName)
+          {
+            ROS_WARN_STREAM("Failed to parse " << rosparam::keys::MarkerTopicName <<
+                            " for body `" << publisherConfig.rigidBodyId << "`. Marker publishing disabled.");
+            publisherConfig.publishMarker = false;
+          }
+          else
+          {
+            publisherConfig.publishMarker = true;
           }
 
           bool readEnableTfPublisher = impl::check_and_get_param(bodyParameters,

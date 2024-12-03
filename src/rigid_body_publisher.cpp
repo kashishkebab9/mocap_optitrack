@@ -31,6 +31,7 @@
 
 #include <geometry_msgs/PoseStamped.h>
 #include <geometry_msgs/Pose2D.h>
+#include <geometry_msgs/PoseArray.h>
 #include <nav_msgs/Odometry.h>
 #include <vector>
 
@@ -99,6 +100,26 @@ nav_msgs::Odometry getRosOdom(RigidBody const& body, const Version& coordinatesV
   }
   return OdometryMsg;
 }
+geometry_msgs::PoseArray getRosMarker(RigidBody const& body, const Version& coordinatesVersion)
+{
+  geometry_msgs::PoseArray MarkerMsg;
+
+  std::vector<std::array<double, 3>> marker_pos = body.rigidBodyMarker;
+
+  for (auto i: marker_pos) {
+    geometry_msgs::Pose pose;
+    pose.position.x = i[0];
+    pose.position.y = i[1];
+    pose.position.z = i[2];
+    pose.orientation.x = 0;
+    pose.orientation.y = 0;
+    pose.orientation.z = 0;
+    pose.orientation.w = 1;
+    MarkerMsg.poses.push_back(pose);
+
+  }
+  return MarkerMsg;
+}
 }  // namespace utilities
 
 RigidBodyPublisher::RigidBodyPublisher(ros::NodeHandle &nh,
@@ -114,6 +135,9 @@ RigidBodyPublisher::RigidBodyPublisher(ros::NodeHandle &nh,
 
   if (config.publishOdom)
     odomPublisher = nh.advertise<nav_msgs::Odometry>(config.odomTopicName, 1000);
+
+  if (config.publishMarker)
+    markerPublisher = nh.advertise<geometry_msgs::PoseArray>(config.markerTopicName, 1000);
 
   // Motive 1.7+ uses a new coordinate system
   // natNetVersion = (natNetVersion >= Version("1.7"));
@@ -140,9 +164,11 @@ void RigidBodyPublisher::publish(ros::Time const& time, RigidBody const& body)
 
   geometry_msgs::PoseStamped pose = utilities::getRosPose(body, coordinatesVersion);
   nav_msgs::Odometry odom =  utilities::getRosOdom(body, coordinatesVersion);
+  geometry_msgs::PoseArray pose_array = utilities::getRosMarker(body, coordinatesVersion);
 
   pose.header.stamp = time;
   odom.header.stamp = time;
+  pose_array.header.stamp = time;
 
   if (config.publishPose)
   {
@@ -150,17 +176,17 @@ void RigidBodyPublisher::publish(ros::Time const& time, RigidBody const& body)
     posePublisher.publish(pose);
   }
 
+  if (config.publishMarker)
+  {
+    pose_array.header.frame_id = config.parentFrameId;
+    markerPublisher.publish(pose_array);
+  }
+
   tf::Quaternion q(pose.pose.orientation.x,
                    pose.pose.orientation.y,
                    pose.pose.orientation.z,
                    pose.pose.orientation.w);
 
-  if (config.publishOdom)
-  {
-    odom.header.frame_id = config.parentFrameId;
-    odom.child_frame_id = config.childFrameId;
-    odomPublisher.publish(odom);
-  }
   if (config.publishOdom)
   {
     odom.header.frame_id = config.parentFrameId;

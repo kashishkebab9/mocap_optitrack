@@ -62,6 +62,7 @@ private:
   ros::Publisher posePublisher;
   ros::Publisher pose2dPublisher;
   ros::Publisher odomPublisher;
+  ros::Publisher markerPublisher;
 };
 
 /// \brief Dispatches RigidBody data to the correct publisher.

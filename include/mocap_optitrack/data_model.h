@@ -73,7 +73,7 @@ struct RigidBody
   Pose pose;
   float meanMarkerError;
   bool isTrackingValid;
-
+  std::vector<std::array<double, 3>> rigidBodyMarker;
   bool hasValidData() const;
 };
 
@@ -104,7 +104,6 @@ struct ModelFrame
   std::vector<MarkerSet> markerSets;
   std::vector<Marker> otherMarkers;
   std::vector<RigidBody> rigidBodies;
-  std::map<int, std::vector<std::array<double, 3>>> rigidBodyToMarker;
 
   float latency;
 };
