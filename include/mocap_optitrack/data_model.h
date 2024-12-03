@@ -32,6 +32,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include <mocap_optitrack/version.h>
 
@@ -103,6 +104,7 @@ struct ModelFrame
   std::vector<MarkerSet> markerSets;
   std::vector<Marker> otherMarkers;
   std::vector<RigidBody> rigidBodies;
+  std::map<int, std::vector<std::array<double, 3>>> rigidBodyToMarker;
 
   float latency;
 };

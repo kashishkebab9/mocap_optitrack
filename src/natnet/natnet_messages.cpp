@@ -248,7 +248,6 @@ void DataFrameMessage::deserialize(
   dataFrame->rigidBodies.resize(numRigidBodies);
   ROS_DEBUG("Rigid count: %d", numRigidBodies);
 
-  std::map<int, std::vector<std::array<double, 3>>> rigidBodyToMarker;
 
   // Loop over rigid bodies
   for (auto& rigidBody : dataFrame->rigidBodies)
@@ -339,7 +338,8 @@ void DataFrameMessage::deserialize(
       std::array<double, 3> marker_pos = {marker.x, marker.y, marker.z};
 
       // append marker pos to this modelIds vector
-      rigidBodyToMarker[modelId].push_back(marker_pos); 
+      dataFrame->rigidBodyToMarker.clear();
+      dataFrame->rigidBodyToMarker[modelId].push_back(marker_pos); 
 
       ROS_DEBUG("  MarkerID: %d, ModelID: %d", markerId, modelId);
       ROS_DEBUG("    Pos: [%3.2f,%3.2f,%3.2f]", 
