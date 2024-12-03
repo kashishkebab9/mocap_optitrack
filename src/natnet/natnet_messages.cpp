@@ -300,6 +300,7 @@ void DataFrameMessage::deserialize(
     ROS_DEBUG("Labeled marker count: %d", numLabeledMarkers);
     std::map<int, std::vector<std::array<double, 3>>> rigidBodyToMarker;
 
+    rigidBodyToMarker.clear();
     // Loop through labeled markers
     for (int j=0; j < numLabeledMarkers; j++)
     {
@@ -339,7 +340,6 @@ void DataFrameMessage::deserialize(
       std::array<double, 3> marker_pos = {marker.x, marker.y, marker.z};
 
       // append marker pos to this modelIds vector
-      rigidBodyToMarker.clear();
       rigidBodyToMarker[modelId].push_back(marker_pos); 
 
       ROS_DEBUG("  MarkerID: %d, ModelID: %d", markerId, modelId);
