@@ -4,13 +4,13 @@
 #
 rigid_bodies:
     '201':
-        pose: crazy00
+        pose: crazy00/pose
         pose2d: crazy00/2d
-        odom: crazy00/Odom
+        odom: crazy00/odom
         marker: crazy00/markers
         tf: tf
         child_frame_id: crazy00
-        parent_frame_id: world
+        parent_frame_id: mocap
 optitrack_config:
         multicast_address: 239.255.42.99
         command_port: 1510
