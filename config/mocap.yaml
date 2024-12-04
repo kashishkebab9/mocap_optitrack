@@ -11,6 +11,14 @@ rigid_bodies:
         tf: tf
         child_frame_id: crazy00
         parent_frame_id: mocap
+    '202':
+        pose: box1/pose
+        pose2d: box1/2d
+        odom: box1/odom
+        marker: box1/individual_marker_array
+        tf: tf
+        child_frame_id: crazy00
+        parent_frame_id: mocap
 optitrack_config:
         multicast_address: 239.255.42.99
         command_port: 1510
