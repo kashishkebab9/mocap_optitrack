@@ -106,17 +106,28 @@ geometry_msgs::PoseArray getRosMarker(RigidBody const& body, const Version& coor
 
   std::vector<std::array<double, 3>> marker_pos = body.rigidBodyMarker;
 
-  for (auto i: marker_pos) {
-    geometry_msgs::Pose pose;
-    pose.position.x = i[0];
-    pose.position.y = i[1];
-    pose.position.z = i[2];
-    pose.orientation.x = 0;
-    pose.orientation.y = 0;
-    pose.orientation.z = 0;
-    pose.orientation.w = 1;
-    MarkerMsg.poses.push_back(pose);
-
+  if (coordinatesVersion < Version("2.0") && coordinatesVersion >= Version("1.7")) {
+    for (auto i: marker_pos) {
+      geometry_msgs::Pose pose;
+      pose.position.x = -i[0]*1000;
+      pose.position.y = i[2]*1000;
+      pose.position.z = i[1]*1000;
+      pose.orientation.x = 0;
+      pose.orientation.y = 0;
+      pose.orientation.z = 0;
+      pose.orientation.w = 1;
+      MarkerMsg.poses.push_back(pose);
+    }
+  } else {
+      geometry_msgs::Pose pose;
+      pose.position.x = i[0]*1000;
+      pose.position.y = -i[2]*1000;
+      pose.position.z = i[1]*1000;
+      pose.orientation.x = 0;
+      pose.orientation.y = 0;
+      pose.orientation.z = 0;
+      pose.orientation.w = 1;
+      MarkerMsg.poses.push_back(pose);
   }
   return MarkerMsg;
 }
