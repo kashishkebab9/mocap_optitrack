@@ -17,7 +17,7 @@ rigid_bodies:
         odom: box1/odom
         marker: box1/individual_marker_array
         tf: tf
-        child_frame_id: crazy00
+        child_frame_id: box1
         parent_frame_id: mocap
 optitrack_config:
         multicast_address: 239.255.42.99
