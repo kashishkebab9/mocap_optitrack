@@ -139,16 +139,16 @@ RigidBodyPublisher::RigidBodyPublisher(ros::NodeHandle &nh,
   config(config)
 {
   if (config.publishPose)
-    posePublisher = nh.advertise<geometry_msgs::PoseStamped>(config.poseTopicName, 1000);
+    posePublisher = nh.advertise<geometry_msgs::PoseStamped>('/'+config.poseTopicName, 1000);
 
   if (config.publishPose2d)
-    pose2dPublisher = nh.advertise<geometry_msgs::Pose2D>(config.pose2dTopicName, 1000);
+    pose2dPublisher = nh.advertise<geometry_msgs::Pose2D>('/'+config.pose2dTopicName, 1000);
 
   if (config.publishOdom)
-    odomPublisher = nh.advertise<nav_msgs::Odometry>(config.odomTopicName, 1000);
+    odomPublisher = nh.advertise<nav_msgs::Odometry>('/'+config.odomTopicName, 1000);
 
   if (config.publishMarker)
-    markerPublisher = nh.advertise<geometry_msgs::PoseArray>(config.markerTopicName, 1000);
+    markerPublisher = nh.advertise<geometry_msgs::PoseArray>('/'+config.markerTopicName, 1000);
 
   // Motive 1.7+ uses a new coordinate system
   // natNetVersion = (natNetVersion >= Version("1.7"));
