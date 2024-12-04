@@ -119,6 +119,7 @@ geometry_msgs::PoseArray getRosMarker(RigidBody const& body, const Version& coor
       MarkerMsg.poses.push_back(pose);
     }
   } else {
+    for (auto i: marker_pos) {
       geometry_msgs::Pose pose;
       pose.position.x = i[0]*1000;
       pose.position.y = -i[2]*1000;
@@ -128,6 +129,7 @@ geometry_msgs::PoseArray getRosMarker(RigidBody const& body, const Version& coor
       pose.orientation.z = 0;
       pose.orientation.w = 1;
       MarkerMsg.poses.push_back(pose);
+    }
   }
   return MarkerMsg;
 }
