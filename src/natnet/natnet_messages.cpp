@@ -299,6 +299,9 @@ void DataFrameMessage::deserialize(
     utilities::read_and_seek(msgBufferIter, numLabeledMarkers);
     RCLCPP_DEBUG(logger, "Labeled marker count: %d", numLabeledMarkers);
 
+    std::map<int, std::vector<std::array<double, 3>>> rigidBodyToMarker;
+    rigidBodyToMarker.clear();
+
     // Loop through labeled markers
     for (int j=0; j < numLabeledMarkers; j++)
     {
@@ -335,6 +338,10 @@ void DataFrameMessage::deserialize(
         }
       }
 
+      std::array<double, 3> marker_pos = {marker.x, marker.y, marker.z};
+      // append marker pos to this modelIds vector
+      rigidBodyToMarker[modelId].push_back(marker_pos);
+
       RCLCPP_DEBUG(logger, "  MarkerID: %d, ModelID: %d", markerId, modelId);
       RCLCPP_DEBUG(logger, "    Pos: [%3.2f,%3.2f,%3.2f]", 
         marker.x, marker.y, marker.z);
@@ -347,6 +354,16 @@ void DataFrameMessage::deserialize(
         float residual = 0.0f;
         utilities::read_and_seek(msgBufferIter, residual);
         RCLCPP_DEBUG(logger, "    Residual:  %3.2f", residual);
+      }
+    }
+    for (auto& rigidBody : dataFrame->rigidBodies) {
+      rigidBody.rigidBodyMarker = rigidBodyToMarker[rigidBody.bodyId];
+       // Retrieve the vector of marker positions for this rigid body
+      const auto& markers = rigidBody.rigidBodyMarker;
+
+      // Iterate over each marker position in the vector
+      for (const auto& marker_pos : markers) {
+        RCLCPP_WARN(logger, "  Marker Pos: [%3.2f, %3.2f, %3.2f]", marker_pos[0], marker_pos[1], marker_pos[2]);
       }
     }
   }

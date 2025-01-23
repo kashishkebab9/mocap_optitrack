@@ -28,6 +28,7 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 #include <geometry_msgs/msg/transform_stamped.hpp>
+#include <geometry_msgs/msg/pose_array.hpp>
 #include <mocap_optitrack/rigid_body_publisher.h>
 #include <tf2/LinearMath/Quaternion.h>
 #include <tf2/LinearMath/Transform.h>
@@ -100,7 +101,42 @@ nav_msgs::msg::Odometry getRosOdom(RigidBody const& body, const Version& coordin
     }
     return OdometryMsg;
 }
+
+geometry_msgs::msg::PoseArray getRosMarker(RigidBody const& body, const Version& coordinatesVersion)
+{
+  geometry_msgs::msg::PoseArray MarkerMsg;
+
+  std::vector<std::array<double, 3>> marker_pos = body.rigidBodyMarker;
+
+  if (coordinatesVersion < Version("2.0") && coordinatesVersion >= Version("1.7")) {
+    for (auto i: marker_pos) {
+      geometry_msgs::msg::Pose pose;
+      pose.position.x = -i[0]*1000;
+      pose.position.y = i[2]*1000;
+      pose.position.z = i[1]*1000;
+      pose.orientation.x = 0;
+      pose.orientation.y = 0;
+      pose.orientation.z = 0;
+      pose.orientation.w = 1;
+      MarkerMsg.poses.push_back(pose);
+    }
+  } else {
+    for (auto i: marker_pos) {
+      geometry_msgs::msg::Pose pose;
+      pose.position.x = i[0]*1000;
+      pose.position.y = -i[2]*1000;
+      pose.position.z = i[1]*1000;
+      pose.orientation.x = 0;
+      pose.orientation.y = 0;
+      pose.orientation.z = 0;
+      pose.orientation.w = 1;
+      MarkerMsg.poses.push_back(pose);
+    }
+  }
+  return MarkerMsg;
+}
 }  // namespace utilities
+
 
 RigidBodyPublisher::RigidBodyPublisher(rclcpp::Node::SharedPtr &node, 
   Version const& natNetVersion,
@@ -108,13 +144,16 @@ RigidBodyPublisher::RigidBodyPublisher(rclcpp::Node::SharedPtr &node,
     config(config), tfPublisher(node)
 {
   if (config.publishPose)
-    posePublisher = node->create_publisher<geometry_msgs::msg::PoseStamped>(config.poseTopicName, 1000);
+    posePublisher = node->create_publisher<geometry_msgs::msg::PoseStamped>('/'+config.poseTopicName, 1000);
 
   if (config.publishPose2d)
-    pose2dPublisher = node->create_publisher<geometry_msgs::msg::Pose2D>(config.pose2dTopicName, 1000);
+    pose2dPublisher = node->create_publisher<geometry_msgs::msg::Pose2D>('/'+config.pose2dTopicName, 1000);
 
   if (config.publishOdom)
-    odomPublisher = node->create_publisher<nav_msgs::msg::Odometry>(config.odomTopicName, 1000);
+    odomPublisher = node->create_publisher<nav_msgs::msg::Odometry>('/'+config.odomTopicName, 1000);
+
+  if(config.publishMarker)
+    markerPublisher = node->create_publisher<geometry_msgs::msg::PoseArray>('/'+config.markerTopicName, 1000);
 
   // Motive 1.7+ uses a new coordinate system
   // natNetVersion = (natNetVersion >= Version("1.7"));
@@ -141,6 +180,7 @@ void RigidBodyPublisher::publish(rclcpp::Time const& time, RigidBody const& body
 
   geometry_msgs::msg::PoseStamped pose = utilities::getRosPose(body, coordinatesVersion);
   nav_msgs::msg::Odometry odom =  utilities::getRosOdom(body, coordinatesVersion);
+  geometry_msgs::msg::PoseArray pose_array = utilities::getRosMarker(body, coordinatesVersion);
 
   double curTimeDifference = time.seconds() - body.trackTimestamp;
 
@@ -161,6 +201,7 @@ void RigidBodyPublisher::publish(rclcpp::Time const& time, RigidBody const& body
 
   pose.header.stamp = rclcpp::Time((int)corStamp, (corStamp-floor(corStamp)) * 1000000000 );
   odom.header.stamp = rclcpp::Time((int)corStamp, (corStamp-floor(corStamp)) * 1000000000 );
+  pose_array.header.stamp = rclcpp::Time((int)corStamp, (corStamp-floor(corStamp)) * 1000000000 );
 
   if (config.publishPose)
   {
@@ -188,6 +229,12 @@ void RigidBodyPublisher::publish(rclcpp::Time const& time, RigidBody const& body
     pose2d.y = pose.pose.position.y;
     pose2d.theta = tf2::getYaw(q);
     pose2dPublisher->publish(pose2d);
+  }
+
+  if (config.publishMarker)
+  {
+    pose_array.header.frame_id = config.parentFrameId;
+    markerPublisher->publish(pose_array);
   }
 
   if (config.publishTf)

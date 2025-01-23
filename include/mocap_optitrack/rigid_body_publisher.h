@@ -40,6 +40,7 @@
 
 #include <geometry_msgs/msg/pose_stamped.hpp>
 #include <geometry_msgs/msg/pose2_d.hpp>
+#include <geometry_msgs/msg/pose_array.hpp>
 #include <nav_msgs/msg/odometry.hpp>
 
 #include <mocap_optitrack/version.h>
@@ -70,6 +71,7 @@ private:
   rclcpp::Publisher<geometry_msgs::msg::PoseStamped>::SharedPtr posePublisher;
   rclcpp::Publisher<geometry_msgs::msg::Pose2D>::SharedPtr pose2dPublisher;
   rclcpp::Publisher<nav_msgs::msg::Odometry>::SharedPtr odomPublisher;
+  rclcpp::Publisher<geometry_msgs::msg::PoseArray>::SharedPtr markerPublisher;
 };
 
 /// \brief Dispatches RigidBody data to the correct publisher.

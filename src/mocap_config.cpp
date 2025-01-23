@@ -168,6 +168,23 @@ void NodeConfiguration::fromRosParam(
       publisherConfig.publishOdom = true;
     }
 
+    if (node->has_parameter(prefix + "." + rosparam::keys::MarkerTopicName))
+    {
+      node->undeclare_parameter(prefix + "." + rosparam::keys::MarkerTopicName);
+    }
+    publisherConfig.markerTopicName = node->declare_parameter(prefix + "." + rosparam::keys::MarkerTopicName,
+                                                            "marker", param_desc);
+    if (publisherConfig.markerTopicName.empty())
+    {
+      RCLCPP_WARN(node->get_logger(), "Failed to parse %s for body %d. Odom publishing disabled.",
+                  rosparam::keys::MarkerTopicName.c_str(), publisherConfig.rigidBodyId);
+      publisherConfig.publishMarker = false;
+    }
+    else
+    {
+      publisherConfig.publishOdom = true;
+    }
+
     if (node->has_parameter(prefix + "." + rosparam::keys::EnableTfPublisher))
     {
       node->undeclare_parameter(prefix + "." + rosparam::keys::EnableTfPublisher);

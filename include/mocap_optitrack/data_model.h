@@ -32,6 +32,7 @@
 
 #include <string>
 #include <vector>
+#include <map>
 
 #include <mocap_optitrack/version.h>
 
@@ -71,6 +72,7 @@ struct RigidBody
     float meanMarkerError;
     bool isTrackingValid;
     double trackTimestamp;
+    std::vector<std::array<double, 3>> rigidBodyMarker;
 
     bool hasValidData() const;
 };
